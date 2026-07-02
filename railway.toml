@@ -1,0 +1,22 @@
+[build]
+builder = "dockerfile"
+dockerfile = "Dockerfile"
+context = "."
+
+[deploy]
+startCommand = "node backend/dist/index.js"
+restartPolicyType = "on_failure"
+restartPolicyMaxRetries = 5
+healthcheckPath = "/health"
+healthcheckTimeout = 30
+
+[services.backend]
+protocol = "http"
+port = 8080
+domain = "prueba-tecnica-${RAILWAY_ENVIRONMENT_NAME}"
+cpuLimit = "512m"
+memoryLimit = "1Gi"
+
+[[services.backend.volumes]]
+name = "data"
+path = "/data"

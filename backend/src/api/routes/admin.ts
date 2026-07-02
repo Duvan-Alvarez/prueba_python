@@ -8,8 +8,7 @@ import {
   eliminarPruebaYCandidato,
 } from '../../services/candidatoService.js';
 import { obtenerRespuestasPorPrueba } from '../../services/respuestaService.js';
-import { INSTRUCCIONES_GENERALES } from '../../utils/ejercicios.js';
-
+import { INSTRUCCIONES_GENERALES } from '../../utils/ejercicios.js';import { sendCandidateLinkEmail } from '../../services/emailService.js';
 const router = Router();
 
 // POST /api/admin/login - Validar credenciales admin
@@ -34,7 +33,7 @@ router.post('/login', (req: Request, res: Response) => {
 });
 
 // POST /api/admin/candidatos - Crear nuevo candidato y prueba
-router.post('/candidatos', authAdminBasic, (req: Request, res: Response) => {
+router.post('/candidatos', authAdminBasic, async (req: Request, res: Response) => {
   try {
     const { nombre, email } = req.body;
 
@@ -47,6 +46,27 @@ router.post('/candidatos', authAdminBasic, (req: Request, res: Response) => {
 
     // Generar link único para compartir
     const linkUnico = `${process.env.FRONTEND_URL || 'http://localhost:3000'}/prueba/${candidato.token_acceso}`;
+
+    try {
+      await sendCandidateLinkEmail(candidato.email, linkUnico);
+    } catch (emailError) {
+      console.error('Error enviando email de link de prueba:', emailError);
+      return res.status(500).json({
+        error: 'Candidato creado, pero no se pudo enviar el email con el link. Revisa la configuración SMTP.',
+        candidato: {
+          id: candidato.id,
+          nombre: candidato.nombre,
+          email: candidato.email,
+          token_acceso: candidato.token_acceso,
+        },
+        prueba: {
+          id: prueba.id,
+          estado: prueba.estado,
+          tiempo_limite_segundos: prueba.tiempo_limite_segundos,
+        },
+        link_unico: linkUnico,
+      });
+    }
 
     res.json({
       candidato: {
@@ -61,6 +81,7 @@ router.post('/candidatos', authAdminBasic, (req: Request, res: Response) => {
         tiempo_limite_segundos: prueba.tiempo_limite_segundos,
       },
       link_unico: linkUnico,
+      email_enviado: true,
     });
   } catch (error: any) {
     console.error(error);

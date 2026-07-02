@@ -42,9 +42,9 @@ router.post(
         return res.status(404).json({ error: 'Respuesta del ejercicio no encontrada' });
       }
 
-      const tieneCodigo = respuesta.codigo?.trim().length > 0;
-      const tieneOutput = respuesta.output_ejecucion?.trim().length > 0;
-      const tieneInterpretacion = respuesta.interpretacion_texto?.trim().length > 0;
+      const tieneCodigo = (respuesta!.codigo || '').trim().length > 0;
+      const tieneOutput = (respuesta!.output_ejecucion || '').trim().length > 0;
+      const tieneInterpretacion = (respuesta!.interpretacion_texto || '').trim().length > 0;
 
       if (!tieneCodigo && !tieneOutput && !tieneInterpretacion) {
         return res.status(400).json({
@@ -54,9 +54,9 @@ router.post(
 
       // Llamar a la IA para calificar
       const resultado = await calificarEjercicio(
-        respuesta.codigo || '',
-        respuesta.output_ejecucion,
-        respuesta.interpretacion_texto || '',
+        respuesta!.codigo || '',
+        respuesta!.output_ejecucion || '',
+        respuesta!.interpretacion_texto || '',
         numeroEjercicio
       );
 

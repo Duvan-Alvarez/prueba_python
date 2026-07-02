@@ -2,6 +2,7 @@ import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import path from 'path';
+import fs from 'fs';
 import { fileURLToPath } from 'url';
 import { initializeDatabase, closeDatabase } from './db/database.js';
 import candidatosRouter from './api/routes/candidatos.js';
@@ -17,7 +18,10 @@ console.log(`Cargando variables de entorno desde ${envPath}`);
 
 const app = express();
 const PORT = process.env.PORT || 5000;
+const NODE_ENV = process.env.NODE_ENV || 'development';
 const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:3000';
+
+// Build allowed origins list
 const ALLOWED_FRONTEND_URLS = [
   FRONTEND_URL,
   'http://localhost:3001',
@@ -27,12 +31,35 @@ const ALLOWED_FRONTEND_URLS = [
   'http://127.0.0.1:3001',
 ];
 
+// In production, allow same origin and specific frontend URL
+if (NODE_ENV === 'production' && FRONTEND_URL) {
+  // Allow requests from same origin (when frontend is served from same domain)
+  ALLOWED_FRONTEND_URLS.push(process.env.RAILWAY_PUBLIC_DOMAIN || '');
+}
+
 const corsOptions = {
   origin: (origin: string | undefined, callback: (err: Error | null, allow?: boolean) => void) => {
-    if (!origin || ALLOWED_FRONTEND_URLS.includes(origin)) {
-      callback(null, true);
+    // Allow requests with no origin (like mobile apps or curl requests)
+    if (!origin) {
+      return callback(null, true);
+    }
+    
+    if (NODE_ENV === 'production') {
+      // In production, be more permissive since frontend and backend are on same domain
+      if (origin === FRONTEND_URL || origin.includes('railway.app') || 
+          ALLOWED_FRONTEND_URLS.includes(origin)) {
+        callback(null, true);
+      } else {
+        console.warn(`CORS rejected origin: ${origin}`);
+        callback(new Error(`Origin ${origin} not allowed by CORS`));
+      }
     } else {
-      callback(new Error(`Origin ${origin} not allowed by CORS`));
+      // In development, allow all localhost variations
+      if (ALLOWED_FRONTEND_URLS.includes(origin) || origin.includes('localhost') || origin.includes('127.0.0.1')) {
+        callback(null, true);
+      } else {
+        callback(new Error(`Origin ${origin} not allowed by CORS`));
+      }
     }
   },
   credentials: true,
@@ -48,6 +75,24 @@ app.use(express.json({ limit: '50mb' }));
 // Servir datasets estáticos para Pyodide
 const datasetsPath = path.resolve(__dirname, '../..', 'datasets');
 app.use('/datasets', express.static(datasetsPath));
+
+// Servir frontend estático si existe (producción)
+try {
+  const frontendDist = path.resolve(__dirname, '../..', 'frontend', 'dist');
+  if (fs.existsSync(frontendDist)) {
+    app.use(express.static(frontendDist));
+    // Fallback para SPA, pero delegar rutas que empiezan con /api o /datasets
+    app.get('*', (req, res, next) => {
+      if (req.path.startsWith('/api') || req.path.startsWith('/datasets')) {
+        return next();
+      }
+      res.sendFile(path.join(frontendDist, 'index.html'));
+    });
+    console.log(`Serviendo frontend estático desde: ${frontendDist}`);
+  }
+} catch (err) {
+  console.warn('No se pudo configurar el servicio estático del frontend:', err);
+}
 
 // Inicializar base de datos
 initializeDatabase();

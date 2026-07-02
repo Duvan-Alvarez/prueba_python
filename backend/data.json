@@ -18,8 +18,8 @@
       "id": 3,
       "nombre": "Duvan Alvarez",
       "email": "duvanalvarezmeneses@gmail.com",
-      "token_acceso": "9797aa02-0966-4ee2-be90-4e667c97496d",
-      "creado_en": "2026-07-02T12:50:49.947Z"
+      "token_acceso": "3328ea2d-ebff-4285-ba50-d0964807c3d4",
+      "creado_en": "2026-07-02T14:59:21.663Z"
     }
   ],
   "pruebas": [
@@ -35,8 +35,8 @@
       "id": 2,
       "candidato_id": 3,
       "estado": "enviada",
-      "iniciada_en": "2026-07-02T12:50:59.152Z",
-      "entregada_en": "2026-07-02T13:05:26.003Z",
+      "iniciada_en": "2026-07-02T14:59:33.899Z",
+      "entregada_en": "2026-07-02T15:05:17.319Z",
       "tiempo_limite_segundos": 2700
     }
   ],
@@ -46,27 +46,27 @@
       "prueba_id": 2,
       "ejercicio_numero": 1,
       "codigo": "import pandas as pd\r\n\r\ndf = pd.read_csv('ventas.csv')\r\n\r\nn_dup = df.duplicated().sum()\r\ndf = df.drop_duplicates()\r\n\r\ndf['fecha'] = pd.to_datetime(df['fecha'], format='mixed', dayfirst=True, errors='coerce')\r\n\r\nn_nulos = df['costo_unitario'].isna().sum()\r\ndf['costo_unitario'] = df.groupby('id_producto')['costo_unitario'] \\\r\n    .transform(lambda x: x.fillna(x.median()))\r\ndf['costo_unitario'] = df['costo_unitario'].fillna(df['costo_unitario'].median())\r\n\r\ndf['ingreso'] = df['cantidad'] * df['precio_unitario']\r\nprint(f\"Duplicados eliminados: {n_dup}\")\r\nprint(f\"Nulos en costo_unitario tratados: {n_nulos}\")\r\nprint(f\"Ingreso total: ${df['ingreso'].sum():,.2f}\")",
-      "output_ejecucion": "Duplicados eliminados: 5\nNulos en costo_unitario tratados: 80\nIngreso total: $12,718,963.63\n",
-      "interpretacion_texto": "datos duplicados que se eliminan, nulos en costos unitario y los ingresos totales",
-      "actualizado_en": "2026-07-02T13:02:21.723Z"
+      "output_ejecucion": null,
+      "interpretacion_texto": "jajaja",
+      "actualizado_en": "2026-07-02T15:04:32.726Z"
     },
     {
       "id": 2,
       "prueba_id": 2,
       "ejercicio_numero": 2,
       "codigo": "productos = pd.read_csv('productos.csv')\r\nclientes = pd.read_csv('clientes.csv')\r\n\r\ndf['margen'] = df['ingreso'] - (df['cantidad'] * df['costo_unitario'])\r\ndf['pct_margen'] = df['margen'] / df['ingreso']\r\n\r\nresumen_prod = df.groupby('id_producto')['margen'].sum() \\\r\n    .reset_index().merge(productos, on='id_producto') \\\r\n    .sort_values('margen', ascending=False)\r\n\r\ntop3 = resumen_prod.head(3)\r\nbottom3 = resumen_prod.tail(3)\r\n\r\ndf_full = df.merge(clientes, on='id_cliente')\r\nresumen_seg = df_full.groupby('segmento').agg(\r\n    margen_total=('margen', 'sum'),\r\n    n_clientes=('id_cliente', 'nunique')\r\n)\r\nresumen_seg['margen_por_cliente'] = resumen_seg['margen_total'] / resumen_seg['n_clientes']",
-      "output_ejecucion": "(sin salida)",
-      "interpretacion_texto": null,
-      "actualizado_en": "2026-07-02T13:02:46.562Z"
+      "output_ejecucion": null,
+      "interpretacion_texto": "gdretweg",
+      "actualizado_en": "2026-07-02T15:04:53.614Z"
     },
     {
       "id": 3,
       "prueba_id": 2,
       "ejercicio_numero": 3,
       "codigo": "import matplotlib.pyplot as plt\r\n\r\nkpis = {\r\n    'Ingreso total': df['ingreso'].sum(),\r\n    '% Margen': df['margen'].sum() / df['ingreso'].sum() * 100,\r\n    'Ticket promedio': df['ingreso'].mean(),\r\n}\r\n\r\ndf['mes'] = df['fecha'].dt.to_period('M')\r\nserie_mensual = df.groupby('mes')['ingreso'].sum().sort_index()\r\ncrecimiento_ultimo_mes = serie_mensual.pct_change().iloc[-1] * 100\r\n\r\ningreso_region = df.groupby('region')['ingreso'].sum().sort_values(ascending=False)\r\ningreso_region.plot(kind='bar', title='Ingreso por región')\r\nplt.show()",
-      "output_ejecucion": "Traceback (most recent call last):\n  File \"<exec>\", line 21, in <module>\n  File \"/lib/python3.11/site-packages/pandas/core/indexing.py\", line 1073, in __getitem__\n    return self._getitem_axis(maybe_callable, axis=axis)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/lib/python3.11/site-packages/pandas/core/indexing.py\", line 1625, in _getitem_axis\n    self._validate_integer(key, axis)\n  File \"/lib/python3.11/site-packages/pandas/core/indexing.py\", line 1557, in _validate_integer\n    raise IndexError(\"single positional indexer is out-of-bounds\")\nIndexError: single positional indexer is out-of-bounds\n",
-      "interpretacion_texto": null,
-      "actualizado_en": "2026-07-02T13:03:49.357Z"
+      "output_ejecucion": null,
+      "interpretacion_texto": "gnrfneha",
+      "actualizado_en": "2026-07-02T15:05:15.017Z"
     }
   ],
   "eventos_actividad": [],
@@ -76,30 +76,30 @@
       "prueba_id": 2,
       "ejercicio_numero": 1,
       "criterio": "Detección y eliminación correcta de duplicados, y estandarización correcta de fechas",
-      "puntaje_ia": 35,
-      "puntaje_final": 35,
+      "puntaje_ia": 85,
+      "puntaje_final": 85,
       "comentario_evaluador": null,
-      "calificado_en": "2026-07-02T13:05:47.585Z"
+      "calificado_en": "2026-07-02T15:05:55.384Z"
     },
     {
       "id": 2,
       "prueba_id": 2,
       "ejercicio_numero": 1,
       "criterio": "Tratamiento justificado de los valores nulos (no solo ejecutado, sino explicado en la interpretación)",
-      "puntaje_ia": 12,
-      "puntaje_final": 12,
+      "puntaje_ia": 5,
+      "puntaje_final": 5,
       "comentario_evaluador": null,
-      "calificado_en": "2026-07-02T13:05:47.585Z"
+      "calificado_en": "2026-07-02T15:05:55.384Z"
     },
     {
       "id": 3,
       "prueba_id": 2,
       "ejercicio_numero": 1,
       "criterio": "Cálculo correcto del ingreso total",
-      "puntaje_ia": 30,
-      "puntaje_final": 30,
+      "puntaje_ia": 80,
+      "puntaje_final": 80,
       "comentario_evaluador": null,
-      "calificado_en": "2026-07-02T13:05:47.585Z"
+      "calificado_en": "2026-07-02T15:05:55.384Z"
     }
   ]
 }

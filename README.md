@@ -148,7 +148,38 @@ El proyecto incluye 3 datasets CSV:
 
 Los datos contienen inconsistencias intencionales (duplicados, valores nulos, formatos mixtos) para que los candidatos practiquen limpieza de datos.
 
+
+## Despliegue en producción
+
+### 🚀 Railway (Recomendado)
+
+Para desplegar en Railway.app con un click:
+
+1. Conecta tu repositorio de GitHub
+2. Crea un nuevo proyecto en Railway
+3. Configura las variables de entorno en el dashboard
+4. Railway automáticamente detectará el Dockerfile y hará el deploy
+
+**Ver guía completa:** [RAILWAY_DEPLOY.md](./RAILWAY_DEPLOY.md)
+
+### 🐳 Docker (Local)
+
+```bash
+# Construir imagen
+docker build -t prueba-tecnica:latest .
+
+# Ejecutar
+docker run -p 5000:5000 \
+  -e NODE_ENV=production \
+  -e ANTHROPIC_API_KEY=sk-ant-... \
+  -e ADMIN_PASSWORD=tu_contraseña \
+  prueba-tecnica:latest
+```
+
+**Ver guía completa:** [README_DEPLOY.md](./README_DEPLOY.md)
+
 ## Ejercicios
+
 
 ### Ejercicio 1 (25%): Limpieza y facturación del período
 - Eliminar duplicados
