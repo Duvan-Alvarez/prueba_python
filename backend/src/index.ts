@@ -91,13 +91,15 @@ app.get('/health', (req, res) => {
 
 // Servir frontend estático si existe (producción)
 const frontendDist = path.resolve(__dirname, '../..', 'frontend', 'dist');
-if (fs.existsSync(frontendDist)) {
-  app.use(express.static(frontendDist));
-  // Fallback para SPA: debe ir después de todas las rutas de la API
-  app.get('*', (req, res) => {
-    // Si la petición no fue manejada por la API o los archivos estáticos,
-    // se asume que es una ruta del frontend y se sirve index.html.
-    res.sendFile(path.join(frontendDist, 'index.html'));
+if (fs.existsSync(frontendDist)) {  // 1. Servir los archivos estáticos del frontend (JS, CSS, imágenes, etc.)
+  app.use(express.static(frontendDist));  
+  // 2. Fallback para SPA. Debe ir DESPUÉS de las rutas de la API y de los estáticos.
+  // Para cualquier otra petición GET que no sea de API, sirve el index.html.
+  app.get('*', (req, res, next) => {
+    if (req.path.startsWith('/api/')) {
+      return next(); // Si es una ruta de API no encontrada, deja que llegue al 404 implícito.
+    }
+    res.sendFile(path.join(frontendDist, 'index.html'));  
   });
   console.log(`✓ Sirviendo frontend estático desde: ${frontendDist}`);
 } else if (NODE_ENV === 'production') {
