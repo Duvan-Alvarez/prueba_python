@@ -49,26 +49,12 @@ router.post('/candidatos', authAdminBasic, async (req: Request, res: Response) =
     const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:3000';
     const linkUnico = `${frontendUrl.replace(/\/$/, '')}/prueba/${candidato.token_acceso}`;
 
+    let emailEnviado = false;
     try {
       await sendCandidateLinkEmail(candidato.email, linkUnico);
+      emailEnviado = true;
     } catch (emailError) {
-      console.error('Error enviando email de link de prueba:', emailError);
-      return res.json({
-        warning: 'Candidato creado, pero no se pudo enviar el email con el link. Revisa la configuracion SMTP.',
-        candidato: {
-          id: candidato.id,
-          nombre: candidato.nombre,
-          email: candidato.email,
-          token_acceso: candidato.token_acceso,
-        },
-        prueba: {
-          id: prueba.id,
-          estado: prueba.estado,
-          tiempo_limite_segundos: prueba.tiempo_limite_segundos,
-        },
-        link_unico: linkUnico,
-        email_enviado: false,
-      });
+      console.warn('Email no configurado, link generado sin enviar email:', emailError);
     }
 
     res.json({
@@ -84,7 +70,7 @@ router.post('/candidatos', authAdminBasic, async (req: Request, res: Response) =
         tiempo_limite_segundos: prueba.tiempo_limite_segundos,
       },
       link_unico: linkUnico,
-      email_enviado: true,
+      email_enviado: emailEnviado,
     });
   } catch (error: any) {
     console.error(error);
