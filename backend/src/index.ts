@@ -76,24 +76,6 @@ app.use(express.json({ limit: '50mb' }));
 const datasetsPath = path.resolve(__dirname, '../..', 'datasets');
 app.use('/datasets', express.static(datasetsPath));
 
-// Servir frontend estático si existe (producción)
-try {
-  const frontendDist = path.resolve(__dirname, '../..', 'frontend', 'dist');
-  if (fs.existsSync(frontendDist)) {
-    app.use(express.static(frontendDist));
-    // Fallback para SPA, pero delegar rutas que empiezan con /api o /datasets
-    app.get('*', (req, res, next) => {
-      if (req.path.startsWith('/api') || req.path.startsWith('/datasets')) {
-        return next();
-      }
-      res.sendFile(path.join(frontendDist, 'index.html'));
-    });
-    console.log(`Serviendo frontend estático desde: ${frontendDist}`);
-  }
-} catch (err) {
-  console.warn('No se pudo configurar el servicio estático del frontend:', err);
-}
-
 // Inicializar base de datos
 initializeDatabase();
 
@@ -106,6 +88,21 @@ app.use('/api/calificacion', calificacionRouter);
 app.get('/health', (req, res) => {
   res.json({ status: 'ok' });
 });
+
+// Servir frontend estático si existe (producción)
+const frontendDist = path.resolve(__dirname, '../..', 'frontend', 'dist');
+if (fs.existsSync(frontendDist)) {
+  app.use(express.static(frontendDist));
+  // Fallback para SPA: debe ir después de todas las rutas de la API
+  app.get('*', (req, res) => {
+    // Si la petición no fue manejada por la API o los archivos estáticos,
+    // se asume que es una ruta del frontend y se sirve index.html.
+    res.sendFile(path.join(frontendDist, 'index.html'));
+  });
+  console.log(`✓ Sirviendo frontend estático desde: ${frontendDist}`);
+} else if (NODE_ENV === 'production') {
+  console.warn(`ADVERTENCIA: El directorio del frontend 'dist' no fue encontrado en ${frontendDist}. El frontend no será servido.`);
+}
 
 // Error handler
 app.use((err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {
