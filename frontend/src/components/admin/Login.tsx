@@ -75,7 +75,7 @@ export default function Login({ onLoginSuccess }: LoginProps) {
         </form>
 
         <div style={{ marginTop: '20px', padding: '12px', backgroundColor: '#f0f0f0', borderRadius: '4px', fontSize: '12px' }}>
-          <strong>Demo:</strong> usuario: <code>admin</code>, contraseña: <code>password123</code>
+         
         </div>
       </div>
     </div>
