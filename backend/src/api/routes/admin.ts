@@ -8,7 +8,8 @@ import {
   eliminarPruebaYCandidato,
 } from '../../services/candidatoService.js';
 import { obtenerRespuestasPorPrueba } from '../../services/respuestaService.js';
-import { INSTRUCCIONES_GENERALES } from '../../utils/ejercicios.js';import { sendCandidateLinkEmail } from '../../services/emailService.js';
+import { INSTRUCCIONES_GENERALES } from '../../utils/ejercicios.js';
+import { sendCandidateLinkEmail } from '../../services/emailService.js';
 const router = Router();
 
 // POST /api/admin/login - Validar credenciales admin
@@ -45,13 +46,14 @@ router.post('/candidatos', authAdminBasic, async (req: Request, res: Response) =
     const prueba = crearPrueba(candidato.id);
 
     // Generar link único para compartir
-    const linkUnico = `${process.env.FRONTEND_URL || 'http://localhost:3000'}/prueba/${candidato.token_acceso}`;
+    const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:3000';
+    const linkUnico = `${frontendUrl.replace(/\/$/, '')}/prueba/${candidato.token_acceso}`;
 
     try {
       await sendCandidateLinkEmail(candidato.email, linkUnico);
     } catch (emailError) {
       console.error('Error enviando email de link de prueba:', emailError);
-      return res.status(500).json({
+      return res.json({
         error: 'Candidato creado, pero no se pudo enviar el email con el link. Revisa la configuración SMTP.',
         candidato: {
           id: candidato.id,
@@ -65,6 +67,7 @@ router.post('/candidatos', authAdminBasic, async (req: Request, res: Response) =
           tiempo_limite_segundos: prueba.tiempo_limite_segundos,
         },
         link_unico: linkUnico,
+        email_enviado: false,
       });
     }
 

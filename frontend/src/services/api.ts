@@ -84,7 +84,7 @@ export async function loginAdmin(username: string, password: string): Promise<{ 
 export async function crearCandidato(
   nombre: string,
   email: string
-): Promise<{ candidato: any; link_unico: string }> {
+): Promise<{ candidato: any; link_unico: string; email_enviado?: boolean; error?: string; warning?: string }> {
   const res = await api.post('/admin/candidatos', { nombre, email });
   return res.data;
 }
