@@ -46,7 +46,11 @@ router.post('/candidatos', authAdminBasic, async (req: Request, res: Response) =
     const prueba = crearPrueba(candidato.id);
 
     // Generar link único para compartir
-    const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:3000';
+    // En Railway, usar RAILWAY_PUBLIC_DOMAIN si está disponible
+    let frontendUrl = process.env.FRONTEND_URL || 'http://localhost:3000';
+    if (process.env.RAILWAY_PUBLIC_DOMAIN) {
+      frontendUrl = `https://${process.env.RAILWAY_PUBLIC_DOMAIN}`;
+    }
     const linkUnico = `${frontendUrl.replace(/\/$/, '')}/prueba/${candidato.token_acceso}`;
 
     let emailEnviado = false;
