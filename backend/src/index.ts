@@ -89,23 +89,6 @@ app.get('/health', (req, res) => {
   res.json({ status: 'ok' });
 });
 
-// Servir frontend estático si existe (producción)
-const frontendDist = path.resolve(__dirname, '../..', 'frontend', 'dist');
-if (fs.existsSync(frontendDist)) {  // 1. Servir los archivos estáticos del frontend (JS, CSS, imágenes, etc.)
-  app.use(express.static(frontendDist));  
-  // 2. Fallback para SPA. Debe ir DESPUÉS de las rutas de la API y de los estáticos.
-  // Para cualquier otra petición GET que no sea de API, sirve el index.html.
-  app.get('*', (req, res, next) => {
-    if (req.path.startsWith('/api/')) {
-      return next(); // Si es una ruta de API no encontrada, deja que llegue al 404 implícito.
-    }
-    res.sendFile(path.join(frontendDist, 'index.html'));  
-  });
-  console.log(`✓ Sirviendo frontend estático desde: ${frontendDist}`);
-} else if (NODE_ENV === 'production') {
-  console.warn(`ADVERTENCIA: El directorio del frontend 'dist' no fue encontrado en ${frontendDist}. El frontend no será servido.`);
-}
-
 // Error handler
 app.use((err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {
   console.error(err);
@@ -127,5 +110,24 @@ process.on('SIGINT', () => {
     process.exit(0);
   });
 });
+
+// Servir frontend estático en producción.
+// Este bloque debe ir DESPUÉS de todas las rutas de la API y ANTES del manejador de errores.
+if (NODE_ENV === 'production') {
+  const frontendDist = path.resolve(__dirname, '../..', 'frontend', 'dist');
+  if (fs.existsSync(frontendDist)) {
+    // 1. Sirve los archivos estáticos (JS, CSS, etc.) desde el directorio 'dist'.
+    app.use(express.static(frontendDist));
+
+    // 2. Para cualquier otra petición GET que no sea de API, sirve el index.html.
+    // Esto permite que el enrutamiento del lado del cliente (React Router) funcione.
+    app.get('*', (req, res) => {
+      res.sendFile(path.join(frontendDist, 'index.html'));
+    });
+    console.log(`✓ Sirviendo frontend estático desde: ${frontendDist}`);
+  } else {
+    console.warn(`ADVERTENCIA: El directorio del frontend 'dist' no fue encontrado en ${frontendDist}. El frontend no será servido.`);
+  }
+}
 
 export default app;
