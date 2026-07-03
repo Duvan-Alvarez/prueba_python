@@ -54,7 +54,7 @@ router.post('/candidatos', authAdminBasic, async (req: Request, res: Response) =
     } catch (emailError) {
       console.error('Error enviando email de link de prueba:', emailError);
       return res.json({
-        error: 'Candidato creado, pero no se pudo enviar el email con el link. Revisa la configuración SMTP.',
+        warning: 'Candidato creado, pero no se pudo enviar el email con el link. Revisa la configuracion SMTP.',
         candidato: {
           id: candidato.id,
           nombre: candidato.nombre,

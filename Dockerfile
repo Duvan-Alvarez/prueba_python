@@ -30,8 +30,8 @@ COPY --from=builder /app/frontend/dist ./frontend/dist
 COPY backend/package.json ./backend/package.json
 COPY backend/package-lock.json ./backend/package-lock.json
 
-# Create data directory for persistent storage
-RUN mkdir -p /app/data
+# Create data directory for persistent storage (volume mount point)
+RUN mkdir -p /data
 
 ENV NODE_ENV=production
 EXPOSE ${PORT:-5000}

@@ -69,7 +69,15 @@ router.post(
       });
     } catch (error: any) {
       console.error(error);
-      res.status(500).json({ error: error.message || 'Error al calificar' });
+      const message = error.message || 'Error al calificar';
+      const statusCode =
+        message.includes('ANTHROPIC_API_KEY') || message.includes('contenido suficiente')
+          ? 400
+          : message.includes('Anthropic')
+          ? 502
+          : 500;
+
+      res.status(statusCode).json({ error: message });
     }
   }
 );

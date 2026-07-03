@@ -20,6 +20,27 @@
       "email": "duvanalvarezmeneses@gmail.com",
       "token_acceso": "3328ea2d-ebff-4285-ba50-d0964807c3d4",
       "creado_en": "2026-07-02T14:59:21.663Z"
+    },
+    {
+      "id": 4,
+      "nombre": "Prueba Codex 500",
+      "email": "codex-20260703083658@example.com",
+      "token_acceso": "37e32b09-7825-4c9a-9aac-51a9d0f7204f",
+      "creado_en": "2026-07-03T13:36:58.679Z"
+    },
+    {
+      "id": 5,
+      "nombre": "Prueba Codex warning",
+      "email": "codex-20260703084030@example.com",
+      "token_acceso": "bab8c9a0-1956-4e4b-819d-4f5adc11d611",
+      "creado_en": "2026-07-03T13:40:30.406Z"
+    },
+    {
+      "id": 6,
+      "nombre": "Prueba Codex crash",
+      "email": "codex-20260703084308@example.com",
+      "token_acceso": "60339e92-5715-43bd-9887-d812536c03a4",
+      "creado_en": "2026-07-03T13:43:08.676Z"
     }
   ],
   "pruebas": [
@@ -37,6 +58,30 @@
       "estado": "enviada",
       "iniciada_en": "2026-07-02T14:59:33.899Z",
       "entregada_en": "2026-07-02T15:05:17.319Z",
+      "tiempo_limite_segundos": 2700
+    },
+    {
+      "id": 3,
+      "candidato_id": 4,
+      "estado": "no_iniciada",
+      "iniciada_en": null,
+      "entregada_en": null,
+      "tiempo_limite_segundos": 2700
+    },
+    {
+      "id": 4,
+      "candidato_id": 5,
+      "estado": "no_iniciada",
+      "iniciada_en": null,
+      "entregada_en": null,
+      "tiempo_limite_segundos": 2700
+    },
+    {
+      "id": 5,
+      "candidato_id": 6,
+      "estado": "no_iniciada",
+      "iniciada_en": null,
+      "entregada_en": null,
       "tiempo_limite_segundos": 2700
     }
   ],
