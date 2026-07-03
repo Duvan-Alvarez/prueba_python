@@ -39,44 +39,62 @@ export async function calificarEjercicio(
     .map((r) => `- ${r.criterio}: ${r.porcentaje}%`)
     .join('\n');
 
-  const prompt = `Eres un evaluador experto de pruebas técnicas para analistas de datos comerciales y financieros. Vas a calificar la respuesta de UN candidato a UN ejercicio específico aplicando estrictamente la rúbrica dada. No inventes criterios adicionales ni agregues campos extra en la respuesta.
+  const prompt = `Eres un evaluador EXPERTO y RIGUROSO de pruebas técnicas para analistas de datos comerciales. Tu evaluación determina si un candidato está listo para trabajar en análisis financiero y comercial real. Califica aplicando estrictamente la rúbrica, siendo exigente pero justo.
 
-EJERCICIO:
+EJERCICIO #${numeroEjercicio}:
 ${ejercicio.consigna}
 
-SOLUCIÓN DE REFERENCIA (existen alternativas válidas, no exijas coincidencia literal):
+SOLUCIÓN DE REFERENCIA:
 ${ejercicio.solucion_referencia}
 
-RÚBRICA (porcentajes sobre 100 puntos del ejercicio):
+RÚBRICA PONDERADA (% del ejercicio):
 ${rubricaTexto}
 
 RESPUESTA DEL CANDIDATO:
---- CÓDIGO ---
-${codigoCandidato || '(sin código)'}
+=== CÓDIGO ===
+${codigoCandidato || '(SIN CÓDIGO)'}
 
---- OUTPUT DE EJECUCIÓN ---
-${outputEjecucion || '(sin salida de ejecución)'}
+=== OUTPUT DE EJECUCIÓN ===
+${outputEjecucion || '(SIN OUTPUT)'}
 
---- INTERPRETACIÓN DE NEGOCIO ESCRITA POR EL CANDIDATO ---
-${interpretacionCandidato || '(sin interpretación de negocio)'}
+=== INTERPRETACIÓN DE NEGOCIO ===
+${interpretacionCandidato || '(SIN INTERPRETACIÓN)'}
 
-Evalúa considerando:
-- El código puede usar una sintaxis distinta a la solución de referencia y ser igualmente correcto; no penalices estilo si el resultado y la lógica son válidos.
-- La interpretación de negocio es el criterio de mayor peso: valora si conecta los números con una implicación de negocio real, si la recomendación es específica y priorizada, y si responde a lo que pide el ejercicio.
-- Si la interpretación está ausente o es muy débil, asigna un puntaje bajo en el criterio de interpretación/negocio y explica por qué.
-- Si el código no ejecuta o el output es incorrecto, refleja esto en los criterios técnicos, pero no ignores la interpretación cuando exista.
-- Ordena el puntaje por criterio exactamente como la rúbrica y usa las claves solicitadas en la respuesta.
+INSTRUCCIONES DE EVALUACIÓN:
 
-Responde ÚNICAMENTE con un JSON válido, sin texto adicional, con esta estructura exacta:
+1. CORRECCIÓN TÉCNICA:
+   - ¿El código responde a lo que pide el ejercicio?
+   - ¿Los números/cálculos son correctos?
+   - ¿Si hay output, es lógicamente consistente con el código?
+   - La sintaxis o estilo distinto NO es penalizable si la lógica es sólida.
+
+2. INTERPRETACIÓN DE NEGOCIO (CRITERIO CRÍTICO):
+   - ¿Conecta los números con implicaciones reales de negocio?
+   - ¿La recomendación es específica, priorizada y accionable?
+   - ¿Responde exactamente lo que el ejercicio pide?
+   - ¿Evita generalizaciones vagas? (ej: "aumentar ventas" sin decir QUÉ aumentar)
+   - Una interpretación débil o genérica = puntaje bajo aunque el código sea correcto.
+
+3. COMPLETITUD:
+   - ¿Entregó TODAS las partes solicitadas del ejercicio?
+   - ¿Cada paso tiene código, output E interpretación?
+
+ASIGNACIÓN DE NIVELES:
+- "excelente": Ejercicio completo, código correcto, interpretación específica y accionable (80-100)
+- "bueno": Código correcto, interpretación presente pero algo genérica, o falta menor completitud (65-79)
+- "aceptable": Código parcialmente correcto O interpretación débil (50-64)
+- "insuficiente": Código incorrecto O interpretación muy débil O incompleto (0-49)
+
+Responde ÚNICAMENTE JSON válido, sin explicaciones adicionales:
 
 {
   "puntaje_por_criterio": [
-    {"criterio": "nombre del criterio según la rúbrica", "puntaje": 0-100, "justificacion": "1-2 líneas"}
+    {"criterio": "nombre exacto de la rúbrica", "puntaje": number, "justificacion": "máx 2 líneas, sé específico"}
   ],
-  "puntaje_total_ejercicio": 0-100,
+  "puntaje_total_ejercicio": number,
   "nivel": "excelente" | "bueno" | "aceptable" | "insuficiente",
-  "retroalimentacion_para_evaluador": "3-5 líneas resumiendo fortalezas y debilidades observadas",
-  "senales_destacables": ["cualquier señal notable, positiva o negativa, por ejemplo 'confunde margen absoluto con relativo' o 'excelente priorización de la recomendación'"]
+  "retroalimentacion_para_evaluador": "párrafo 3-5 líneas: fortalezas reales, debilidades específicas, qué faltó",
+  "senales_destacables": ["señal 1", "señal 2", "etc"]
 }`;
 
   const apiKey = process.env.ANTHROPIC_API_KEY;
@@ -88,8 +106,8 @@ Responde ÚNICAMENTE con un JSON válido, sin texto adicional, con esta estructu
     const response = await axios.post(
       'https://api.anthropic.com/v1/messages',
       {
-        model: 'claude-sonnet-4-6',
-        max_tokens: 1024,
+        model: 'claude-opus-4-8',
+        max_tokens: 2048,
         messages: [
           {
             role: 'user',
