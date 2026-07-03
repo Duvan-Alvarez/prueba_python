@@ -43,9 +43,9 @@ ventas.loc[mask_formato, 'fecha'] = pd.to_datetime(
     ventas.loc[mask_formato, 'fecha']
 ).dt.strftime('%d/%m/%Y')
 
-ventas.to_csv('datasets/ventas.csv', index=False, quoting=1)  # QUOTE_ALL for safety
-clientes.to_csv('datasets/clientes.csv', index=False)
-productos.to_csv('datasets/productos.csv', index=False)
+ventas.to_csv('datasets/ventas.csv', index=False, na_rep='NA')
+clientes.to_csv('datasets/clientes.csv', index=False, na_rep='NA')
+productos.to_csv('datasets/productos.csv', index=False, na_rep='NA')
 
 print("Filas ventas:", len(ventas))
 print("Filas clientes:", len(clientes))
